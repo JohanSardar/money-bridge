@@ -1,0 +1,66 @@
+[project]
+name = "money-bridge"
+version = "0.1.0"
+description = "Self-hosted bridge giving AI agents scoped, audited access to your finances through official provider APIs"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.32",
+    "sse-starlette>=2.1",
+    "fastmcp>=2.12",
+    "typer>=0.12",
+    "pydantic>=2.9",
+    "sqlcipher3>=0.6.4",
+    "cryptography>=43",
+    "httpx>=0.27",
+    "platformdirs>=4.3",
+    "keyring>=25",
+    "pyyaml>=6",
+]
+
+[project.scripts]
+moneybridge = "money_bridge.app:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-timeout>=2.3",
+    "hypothesis>=6.112",
+    "ruff>=0.7",
+    "mypy>=1.13",
+    "types-pyyaml",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/money_bridge"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src"]
+disallow_untyped_defs = true
+no_implicit_optional = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "sim: fake providers, approver and broker as real processes",
+    "sandbox: public provider sandboxes or paper accounts",
+    "real: the owner's real accounts, read-only",
+]
+timeout = 300

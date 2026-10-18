@@ -1,0 +1,852 @@
+version: 1
+levels:
+- sim
+- sandbox
+- real
+feature_statuses:
+- planned
+- in_progress
+- done
+- limited
+scenario_statuses:
+- planned
+- passing
+- limited
+features:
+- id: m0.quality-gates
+  milestone: M0
+  title: Zero-comment lint, ruff, mypy, import boundaries, features checker, CI
+  requirement: 'BUILD-GOAL: code quality, zero comments'
+  module: repo
+  status: done
+  scenarios:
+  - test: tests/unit/test_repo_rules.py::test_no_comments
+    level: sim
+    status: passing
+  - test: tests/unit/test_repo_rules.py::test_import_boundaries
+    level: sim
+    status: passing
+  - test: tests/unit/test_repo_rules.py::test_features_yaml_valid
+    level: sim
+    status: passing
+- id: m1.store
+  milestone: M1
+  title: Encrypted SQLCipher evidence store with encrypted blobs
+  requirement: 'DECISIONS r1 Security: high bar, data only on owner''s machine, disk encrypted'
+  module: evidence
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_store.py::test_core_db_is_encrypted_at_rest
+    level: sim
+    status: planned
+  - test: tests/e2e/test_store.py::test_wrong_key_cannot_open
+    level: sim
+    status: planned
+  - test: tests/e2e/test_store.py::test_data_survives_restart
+    level: sim
+    status: planned
+  - test: tests/e2e/test_store.py::test_blob_tamper_is_detected
+    level: sim
+    status: planned
+- id: m1.host-secrets
+  milestone: M1
+  title: Secret stores per role, volume encryption check and attestation, production refuses test adapters
+  requirement: 'DECISIONS r1 Security: high bar, data only on owner''s machine, disk encrypted'
+  module: host
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_host.py::test_unencrypted_volume_refused
+    level: sim
+    status: planned
+  - test: tests/e2e/test_host.py::test_unknown_volume_requires_attestation
+    level: sim
+    status: planned
+  - test: tests/e2e/test_host.py::test_production_profile_refuses_test_adapters
+    level: sim
+    status: planned
+  - test: tests/e2e/test_host.py::test_no_plaintext_secret_fallback
+    level: sim
+    status: planned
+- id: m1.simplefin
+  milestone: M1
+  title: 'SimpleFIN connection: claim setup token, ingest accounts, balances, pending and posted transactions, holdings extension'
+  requirement: 'DECISIONS r5: SimpleFIN first'
+  module: sources
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_simplefin.py::test_connect_with_setup_token_claims_once
+    level: sim
+    status: planned
+  - test: tests/e2e/test_simplefin.py::test_access_url_never_leaves_secret_store
+    level: sim
+    status: planned
+  - test: tests/e2e/test_simplefin.py::test_accounts_balances_transactions_ingested
+    level: sim
+    status: planned
+  - test: tests/e2e/test_simplefin.py::test_pending_transactions_included
+    level: sim
+    status: planned
+  - test: tests/e2e/test_simplefin.py::test_holdings_extension_captured
+    level: sim
+    status: planned
+  - test: tests/e2e/test_simplefin.py::test_errlist_marks_connection_state
+    level: sim
+    status: planned
+  - test: tests/sandbox/test_simplefin_demo.py::test_demo_token_end_to_end
+    level: sandbox
+    status: planned
+  - test: tests/real/test_simplefin_owner.py::test_owner_accounts_read_only
+    level: real
+    status: limited
+    limited_reason: 'No SimpleFIN access URL or setup token exists on this machine or the Air. Owner step: create a setup token at https://beta-bridge.simplefin.org/simplefin/create and run `moneybridge
+      connect simplefin` (hidden prompt), then `pytest -m real`.'
+- id: m1.revisions
+  milestone: M1
+  title: 'Observations, revisions and sightings: A->B->A, knowledge-time queries, pending uncertainty, no heuristic merge'
+  requirement: 'DECISIONS r1 History: keep everything forever, backfill'
+  module: evidence
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_revisions.py::test_identical_refetch_records_sighting_not_revision
+    level: sim
+    status: planned
+  - test: tests/e2e/test_revisions.py::test_a_b_a_creates_three_revisions
+    level: sim
+    status: planned
+  - test: tests/e2e/test_revisions.py::test_as_of_returns_knowledge_at_time
+    level: sim
+    status: planned
+  - test: tests/e2e/test_revisions.py::test_pending_absent_from_window_is_unconfirmed_not_removed
+    level: sim
+    status: planned
+  - test: tests/e2e/test_revisions.py::test_no_heuristic_merge_of_identical_purchases
+    level: sim
+    status: planned
+- id: m1.atomic-ingest
+  milestone: M1
+  title: Rows, projections, events and checkpoint commit atomically; crash safety
+  requirement: 'DECISIONS r1 History: keep everything forever, backfill'
+  module: evidence
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_atomic_ingest.py::test_crash_before_commit_leaves_no_rows_or_cursor
+    level: sim
+    status: planned
+  - test: tests/e2e/test_atomic_ingest.py::test_crash_after_commit_has_rows_cursor_and_events
+    level: sim
+    status: planned
+  - test: tests/e2e/test_atomic_ingest.py::test_no_lost_observation_across_restart
+    level: sim
+    status: planned
+- id: m1.doors
+  milestone: M1
+  title: CLI, MCP (stdio and Streamable HTTP) and HTTP generated from one operation registry with identical results and errors
+  requirement: 'DECISIONS r2: an API, an MCP server and a CLI; r3: live event feed'
+  module: access
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_doors.py::test_same_results_on_every_door
+    level: sim
+    status: planned
+  - test: tests/e2e/test_doors.py::test_error_codes_identical_on_every_door
+    level: sim
+    status: planned
+  - test: tests/e2e/test_doors.py::test_openapi_and_mcp_tools_generated_from_registry
+    level: sim
+    status: planned
+- id: m1.keys
+  milestone: M1
+  title: Per-agent keys with grant documents, expiry, revocation, owner-only administration
+  requirement: 'DECISIONS r3: every agent gets its own scoped key; every read and action is logged'
+  module: access
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_keys.py::test_owner_creates_key_shown_once
+    level: sim
+    status: planned
+  - test: tests/e2e/test_keys.py::test_agent_key_cannot_administer
+    level: sim
+    status: planned
+  - test: tests/e2e/test_keys.py::test_expired_key_rejected
+    level: sim
+    status: planned
+  - test: tests/e2e/test_keys.py::test_revoked_key_rejected_immediately
+    level: sim
+    status: planned
+  - test: tests/e2e/test_keys.py::test_unknown_grant_dimension_rejected
+    level: sim
+    status: planned
+- id: m1.scopes
+  milestone: M1
+  title: Scope and allowlist enforcement on every door, history, counts, events and raw
+  requirement: 'DECISIONS r3: every agent gets its own scoped key; every read and action is logged'
+  module: access
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_scopes.py::test_scope_denial_on_every_door
+    level: sim
+    status: planned
+  - test: tests/e2e/test_scopes.py::test_account_allowlist_filters_lists_history_counts_events
+    level: sim
+    status: planned
+  - test: tests/e2e/test_scopes.py::test_connection_allowlist_enforced
+    level: sim
+    status: planned
+  - test: tests/e2e/test_scopes.py::test_raw_requires_read_raw
+    level: sim
+    status: planned
+- id: m1.audit
+  milestone: M1
+  title: Audit before every disclosure, denied calls audited, hash chain verification, no secrets
+  requirement: 'DECISIONS r3: every agent gets its own scoped key; every read and action is logged'
+  module: access
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_audit.py::test_every_disclosure_audited_before_response
+    level: sim
+    status: planned
+  - test: tests/e2e/test_audit.py::test_denied_and_unauthenticated_calls_audited
+    level: sim
+    status: planned
+  - test: tests/e2e/test_audit.py::test_audit_chain_verifies_and_detects_tamper
+    level: sim
+    status: planned
+  - test: tests/e2e/test_audit.py::test_audit_never_contains_secrets
+    level: sim
+    status: planned
+- id: m1.events
+  milestone: M1
+  title: Replayable SSE event feed and pull pages, grant-filtered, revocation closes streams, bounded queues
+  requirement: 'DECISIONS r2: an API, an MCP server and a CLI; r3: live event feed'
+  module: access
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_events.py::test_sse_replay_from_cursor
+    level: sim
+    status: planned
+  - test: tests/e2e/test_events.py::test_last_event_id_resume
+    level: sim
+    status: planned
+  - test: tests/e2e/test_events.py::test_events_filtered_by_grant
+    level: sim
+    status: planned
+  - test: tests/e2e/test_events.py::test_revocation_closes_open_stream
+    level: sim
+    status: planned
+  - test: tests/e2e/test_events.py::test_slow_consumer_disconnected_with_cursor
+    level: sim
+    status: planned
+  - test: tests/e2e/test_events.py::test_pull_pages_on_every_door
+    level: sim
+    status: planned
+- id: m1.refresh
+  milestone: M1
+  title: Manual refresh within provider budget and the freshness contract on every item
+  requirement: 'DECISIONS r2/final: data as up to date as possible; sync schedule'
+  module: sources
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_refresh.py::test_manual_refresh_within_budget
+    level: sim
+    status: planned
+  - test: tests/e2e/test_refresh.py::test_refresh_beyond_budget_rate_limited
+    level: sim
+    status: planned
+  - test: tests/e2e/test_refresh.py::test_freshness_fields_present
+    level: sim
+    status: planned
+  - test: tests/e2e/test_refresh.py::test_max_age_unmet_flag
+    level: sim
+    status: planned
+- id: m1.untrusted-text
+  milestone: M1
+  title: Provider text treated as data; terminal escapes neutralized
+  requirement: 'DECISIONS r1 Security: high bar, data only on owner''s machine, disk encrypted'
+  module: access
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_untrusted_text.py::test_injection_text_returned_as_data
+    level: sim
+    status: planned
+  - test: tests/e2e/test_untrusted_text.py::test_terminal_escapes_neutralized_in_cli
+    level: sim
+    status: planned
+- id: m1.capabilities
+  milestone: M1
+  title: Capability reports with a reason for every unavailable capability
+  requirement: 'DECISIONS r3: actions only through official APIs'
+  module: sources
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_capabilities.py::test_capabilities_report_reasons
+    level: sim
+    status: planned
+- id: m1.uv-install
+  milestone: M1
+  title: '`uv tool install` distribution with a synthetic demo'
+  requirement: 'DECISIONS r1/r2: for everybody, runs on any computer, public MIT project'
+  module: host
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_packaging.py::test_uv_tool_install_from_checkout_runs_demo
+    level: sim
+    status: planned
+  - test: scripts/smoke_macos.sh::uv_install_demo
+    level: sandbox
+    status: planned
+  - test: ci/windows::uv_install_demo
+    level: sandbox
+    status: planned
+- id: m2.schedule
+  milestone: M2
+  title: SimpleFIN scheduled 4x/day with jitter, shared budget, one catch-up after sleep
+  requirement: 'DECISIONS r2/final: data as up to date as possible; sync schedule'
+  module: sources
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_schedule.py::test_simplefin_four_times_a_day_with_jitter
+    level: sim
+    status: planned
+  - test: tests/e2e/test_schedule.py::test_budget_shared_with_backfill
+    level: sim
+    status: planned
+  - test: tests/e2e/test_schedule.py::test_resume_after_sleep_runs_one_catchup
+    level: sim
+    status: planned
+- id: m2.backfill
+  milestone: M2
+  title: Backfill in 90-day windows with honest coverage, gaps and resume
+  requirement: 'DECISIONS r1 History: keep everything forever, backfill'
+  module: sources
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_backfill.py::test_backfill_walks_90_day_windows
+    level: sim
+    status: planned
+  - test: tests/e2e/test_backfill.py::test_gaps_recorded_not_claimed_complete
+    level: sim
+    status: planned
+  - test: tests/e2e/test_backfill.py::test_backfill_resumes_after_restart
+    level: sim
+    status: planned
+- id: m2.imports
+  milestone: M2
+  title: CSV (generic, Venmo, Chase, Amex presets), OFX/QFX and PDF imports with provenance and idempotent re-import
+  requirement: 'DECISIONS r1 History: keep everything forever, backfill'
+  module: sources
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_imports.py::test_csv_import_with_mapping
+    level: sim
+    status: planned
+  - test: tests/e2e/test_imports.py::test_reimport_same_file_is_idempotent
+    level: sim
+    status: planned
+  - test: tests/e2e/test_imports.py::test_identical_rows_both_kept
+    level: sim
+    status: planned
+  - test: tests/e2e/test_imports.py::test_mapping_change_creates_derived_revisions
+    level: sim
+    status: planned
+  - test: tests/e2e/test_imports.py::test_venmo_csv_preset
+    level: sim
+    status: planned
+  - test: tests/e2e/test_imports.py::test_ofx_and_qfx_import
+    level: sim
+    status: planned
+  - test: tests/e2e/test_imports.py::test_pdf_archived_and_downloadable
+    level: sim
+    status: planned
+  - test: tests/e2e/test_imports.py::test_malicious_csv_is_data_only
+    level: sim
+    status: planned
+- id: m2.annotations
+  milestone: M2
+  title: Annotations (tags, category, notes, business/personal) with undo
+  requirement: 'DECISIONS r1: organizing needs no approval, with undo'
+  module: evidence
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_annotations.py::test_annotate_and_undo
+    level: sim
+    status: planned
+  - test: tests/e2e/test_annotations.py::test_annotation_requires_scope
+    level: sim
+    status: planned
+  - test: tests/e2e/test_annotations.py::test_annotations_emit_events
+    level: sim
+    status: planned
+- id: m2.relations
+  milestone: M2
+  title: Possible-match relations proposed, never merged; owner confirms or rejects
+  requirement: 'DECISIONS r1 History: keep everything forever, backfill'
+  module: evidence
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_relations.py::test_possible_match_proposed_not_merged
+    level: sim
+    status: planned
+  - test: tests/e2e/test_relations.py::test_owner_confirms_or_rejects_match
+    level: sim
+    status: planned
+- id: m2.backup
+  milestone: M2
+  title: Encrypted backup and read-only restore with blob manifest and audit head
+  requirement: 'DECISIONS r1 Security: high bar, data only on owner''s machine, disk encrypted'
+  module: evidence
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_backup.py::test_backup_restore_round_trip
+    level: sim
+    status: planned
+  - test: tests/e2e/test_backup.py::test_restore_is_read_only
+    level: sim
+    status: planned
+  - test: tests/e2e/test_backup.py::test_backup_is_encrypted
+    level: sim
+    status: planned
+  - test: tests/e2e/test_backup.py::test_restore_detects_corrupt_blob
+    level: sim
+    status: planned
+- id: m2.disconnect
+  milestone: M2
+  title: History retained after a source disconnects
+  requirement: 'DECISIONS r1 History: keep everything forever, backfill'
+  module: sources
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_disconnect.py::test_history_retained_after_disconnect
+    level: sim
+    status: planned
+- id: m3.plaid-enroll
+  milestone: M3
+  title: Plaid Hosted Link enrollment via the official SDK
+  requirement: 'DECISIONS r5: Plaid second; RESOLUTION M19 Hosted Link via SDK'
+  module: sources
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_plaid.py::test_hosted_link_enrollment
+    level: sim
+    status: planned
+  - test: tests/sandbox/test_plaid_sandbox.py::test_sandbox_item_sync
+    level: sandbox
+    status: limited
+    limited_reason: 'Needs the owner''s Plaid developer account (identity-bound signup). Owner step: create a Plaid account at https://dashboard.plaid.com/signup, then `moneybridge connect plaid --client-id
+      ... ` (secret via hidden prompt) and run `pytest -m sandbox`.'
+- id: m3.plaid-sync
+  milestone: M3
+  title: /transactions/sync with atomic cursor, pagination-mutation restart, removals, pending relations
+  requirement: 'DECISIONS r1 History: keep everything forever, backfill'
+  module: sources
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_plaid.py::test_sync_cursor_pages_atomic
+    level: sim
+    status: planned
+  - test: tests/e2e/test_plaid.py::test_pagination_mutation_restarts_from_original_cursor
+    level: sim
+    status: planned
+  - test: tests/e2e/test_plaid.py::test_removed_transactions_tombstoned
+    level: sim
+    status: planned
+  - test: tests/e2e/test_plaid.py::test_pending_transaction_id_relation
+    level: sim
+    status: planned
+  - test: tests/e2e/test_plaid.py::test_item_login_required_state
+    level: sim
+    status: planned
+- id: m3.plaid-poll
+  milestone: M3
+  title: Plaid polled every 2 minutes with automatic back-off
+  requirement: 'DECISIONS r2/final: data as up to date as possible; sync schedule'
+  module: sources
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_plaid.py::test_polls_every_two_minutes
+    level: sim
+    status: planned
+  - test: tests/e2e/test_plaid.py::test_rate_limit_backoff_and_recovery
+    level: sim
+    status: planned
+- id: m3.plaid-products
+  milestone: M3
+  title: Holdings and liabilities where entitled, reasons where not
+  requirement: 'DECISIONS r1: investments, liabilities, bills'
+  module: sources
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_plaid.py::test_holdings_and_liabilities_when_entitled
+    level: sim
+    status: planned
+  - test: tests/e2e/test_plaid.py::test_product_not_entitled_reason
+    level: sim
+    status: planned
+- id: m3.plaid-webhook
+  milestone: M3
+  title: Optional Plaid webhook switch, off by default, verified, only wakes a sync
+  requirement: 'DECISIONS r2/final: data as up to date as possible; sync schedule'
+  module: sources
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_plaid.py::test_webhook_off_by_default
+    level: sim
+    status: planned
+  - test: tests/e2e/test_plaid.py::test_webhook_signature_verified_and_only_wakes_sync
+    level: sim
+    status: planned
+- id: m4.teller-reads
+  milestone: M4
+  title: Teller enrollment capture, mTLS reads with 10-day overlap, disconnected state
+  requirement: 'DECISIONS r5: Teller third'
+  module: sources
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_teller.py::test_connect_enrollment_captured
+    level: sim
+    status: planned
+  - test: tests/e2e/test_teller.py::test_mtls_required
+    level: sim
+    status: planned
+  - test: tests/e2e/test_teller.py::test_reads_with_ten_day_overlap
+    level: sim
+    status: planned
+  - test: tests/e2e/test_teller.py::test_enrollment_disconnected_state
+    level: sim
+    status: planned
+  - test: tests/sandbox/test_teller_sandbox.py::test_sandbox_reads
+    level: sandbox
+    status: limited
+    limited_reason: 'Needs the owner''s Teller application and certificate (identity-bound signup). Owner step: sign up at https://teller.io, download the app certificate, run `moneybridge connect teller
+      --environment sandbox`, then `pytest -m sandbox`.'
+- id: m4.teller-poll
+  milestone: M4
+  title: Teller polled every 2 minutes with back-off
+  requirement: 'DECISIONS r2/final: data as up to date as possible; sync schedule'
+  module: sources
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_teller.py::test_polls_every_two_minutes_with_backoff
+    level: sim
+    status: planned
+- id: m4.teller-capabilities
+  milestone: M4
+  title: Teller capability discovery including Zelle with exact blockers
+  requirement: 'DECISIONS r3: actions only through official APIs'
+  module: sources
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_teller.py::test_capabilities_show_zelle_blockers
+    level: sim
+    status: planned
+- id: m5.executor
+  milestone: M5
+  title: Separate executor process with private journal and authenticated socket
+  requirement: 'RESOLUTION: two trusted processes; M2 executor owns action authority'
+  module: executor
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_executor.py::test_executor_separate_process_and_journal
+    level: sim
+    status: planned
+  - test: tests/e2e/test_executor.py::test_core_cannot_mark_approved
+    level: sim
+    status: planned
+  - test: tests/e2e/test_executor.py::test_exec_socket_rejects_unknown_peer
+    level: sim
+    status: planned
+- id: m5.isolation
+  milestone: M5
+  title: Executor isolation from the agent OS user (Linux, dedicated test user)
+  requirement: 'DECISIONS final: product ships executor isolation for everyone else'
+  module: host
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_isolation.py::test_agent_user_cannot_read_journal_or_secrets
+    level: sim
+    status: planned
+  - test: tests/e2e/test_isolation.py::test_agent_user_cannot_reach_exec_or_owner_socket
+    level: sim
+    status: planned
+- id: m5.intents
+  milestone: M5
+  title: Frozen intents, digests, request-key dedupe, approval binding and expiry
+  requirement: 'DECISIONS r1/r3/r5: every money move needs the owner''s passkey approval, reused not built'
+  module: executor
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_intents.py::test_propose_freezes_and_digests
+    level: sim
+    status: planned
+  - test: tests/e2e/test_intents.py::test_request_key_dedupe_and_conflict
+    level: sim
+    status: planned
+  - test: tests/e2e/test_intents.py::test_changed_terms_need_new_approval
+    level: sim
+    status: planned
+  - test: tests/e2e/test_intents.py::test_approval_for_other_intent_rejected
+    level: sim
+    status: planned
+  - test: tests/e2e/test_intents.py::test_unpinned_credential_rejected
+    level: sim
+    status: planned
+  - test: tests/e2e/test_intents.py::test_expired_approval_rejected
+    level: sim
+    status: planned
+  - test: tests/e2e/test_intents.py::test_denied_approval_terminal
+    level: sim
+    status: planned
+  - test: tests/e2e/test_intents.py::test_pending_queue_limit
+    level: sim
+    status: planned
+- id: m5.limits
+  milestone: M5
+  title: Per-action and rolling-24h limits with atomic reservations
+  requirement: RESOLUTION M12
+  module: executor
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_limits.py::test_per_action_limit
+    level: sim
+    status: planned
+  - test: tests/e2e/test_limits.py::test_rolling_daily_limit
+    level: sim
+    status: planned
+  - test: tests/e2e/test_limits.py::test_concurrent_reservations_atomic
+    level: sim
+    status: planned
+  - test: tests/e2e/test_limits.py::test_unknown_outcome_keeps_reservation
+    level: sim
+    status: planned
+  - test: tests/e2e/test_limits.py::test_policy_change_while_awaiting_approval
+    level: sim
+    status: planned
+- id: m5.submission
+  milestone: M5
+  title: 'Crash-safe submission: no double submission, unknown outcome never resent, reconciliation'
+  requirement: RESOLUTION M11
+  module: executor
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_submission.py::test_no_double_submission_on_retry
+    level: sim
+    status: planned
+  - test: tests/e2e/test_submission.py::test_crash_before_send_not_submitted
+    level: sim
+    status: planned
+  - test: tests/e2e/test_submission.py::test_crash_after_send_outcome_unknown
+    level: sim
+    status: planned
+  - test: tests/e2e/test_submission.py::test_unknown_never_resent
+    level: sim
+    status: planned
+  - test: tests/e2e/test_submission.py::test_reconcile_resolves_by_client_id
+    level: sim
+    status: planned
+  - test: tests/e2e/test_submission.py::test_empty_lookup_does_not_authorize_resend
+    level: sim
+    status: planned
+- id: m5.approval-adapters
+  milestone: M5
+  title: 'Approval adapters: Fake (Cosignet-shaped), Cosignet, Link native; unqualified keeps actions off'
+  requirement: 'DECISIONS r1/r3/r5: every money move needs the owner''s passkey approval, reused not built'
+  module: executor
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_approval_adapters.py::test_fake_cosignet_round_trip
+    level: sim
+    status: planned
+  - test: tests/e2e/test_approval_adapters.py::test_link_native_approval_contract
+    level: sim
+    status: planned
+  - test: tests/e2e/test_approval_adapters.py::test_unqualified_adapter_keeps_actions_off
+    level: sim
+    status: planned
+  - test: tests/real/test_cosignet_owner.py::test_cosignet_qualification
+    level: real
+    status: limited
+    limited_reason: 'Needs the owner''s Cosignet account and passkey enrollment (identity-bound). Owner step: sign up at https://cosignet.com, then `moneybridge owner enroll-approver cosignet`.'
+- id: m5.provider-tools
+  milestone: M5
+  title: Official Alpaca MCP and Link CLI run privately with pinned manifests and proxy controls
+  requirement: 'DECISIONS r4: run official MCPs/CLIs behind the scenes, stop money tools for approval'
+  module: executor
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_provider_tools.py::test_alpaca_manifest_pinned
+    level: sim
+    status: planned
+  - test: tests/e2e/test_provider_tools.py::test_alpaca_reads_pass_through_filtered
+    level: sim
+    status: planned
+  - test: tests/e2e/test_provider_tools.py::test_alpaca_order_tool_becomes_intent
+    level: sim
+    status: planned
+  - test: tests/e2e/test_provider_tools.py::test_hidden_tool_call_rejected
+    level: sim
+    status: planned
+  - test: tests/e2e/test_provider_tools.py::test_unknown_tool_denied
+    level: sim
+    status: planned
+  - test: tests/e2e/test_provider_tools.py::test_no_header_forwarding
+    level: sim
+    status: planned
+  - test: tests/e2e/test_provider_tools.py::test_link_cli_manifest_pinned
+    level: sim
+    status: planned
+  - test: tests/e2e/test_provider_tools.py::test_link_reads_archived
+    level: sim
+    status: planned
+  - test: tests/sandbox/test_alpaca_paper.py::test_paper_limit_order_with_fake_approval
+    level: sandbox
+    status: limited
+    limited_reason: 'Needs the owner''s Alpaca paper account keys (identity-bound signup). Owner step: sign up at https://app.alpaca.markets, create paper API keys, run `moneybridge connect alpaca --paper`,
+      then `pytest -m sandbox`.'
+- id: m5.recovery
+  milestone: M5
+  title: Restored backups cannot execute; new epoch after recovery
+  requirement: RESOLUTION M15
+  module: executor
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_recovery.py::test_restored_backup_cannot_execute
+    level: sim
+    status: planned
+  - test: tests/e2e/test_recovery.py::test_new_epoch_after_recover
+    level: sim
+    status: planned
+- id: m5.high-impact
+  milestone: M5
+  title: High-impact non-money actions disabled with reasons
+  requirement: RESOLUTION D6
+  module: executor
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_high_impact.py::test_high_impact_actions_disabled_with_reason
+    level: sim
+    status: planned
+- id: m6.link-actions
+  milestone: M6
+  title: Link reads and approved purchases through official merchant APIs (MPP)
+  requirement: 'DECISIONS r3: Stripe Link read + act'
+  module: executor
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_link_actions.py::test_link_purchase_via_mpp_merchant
+    level: sim
+    status: planned
+  - test: tests/e2e/test_link_actions.py::test_payment_credentials_never_leave_executor
+    level: sim
+    status: planned
+  - test: tests/e2e/test_link_actions.py::test_card_form_checkout_unavailable
+    level: sim
+    status: planned
+  - test: tests/real/test_link_owner.py::test_link_reads_owner
+    level: real
+    status: limited
+    limited_reason: 'Needs the owner''s Stripe Link account and `link-cli auth login` on this machine. Owner step: run `moneybridge connect link` and approve the device login on the phone.'
+- id: m6.teller-zelle
+  milestone: M6
+  title: Teller Zelle payments with approval if admitted
+  requirement: 'DECISIONS r3: Zelle via Chase (Teller payments beta)'
+  module: executor
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_teller_zelle.py::test_zelle_payment_with_approval
+    level: sim
+    status: planned
+  - test: tests/e2e/test_teller_zelle.py::test_zelle_idempotency_window
+    level: sim
+    status: planned
+  - test: tests/sandbox/test_teller_zelle_sandbox.py::test_zelle_sandbox
+    level: sandbox
+    status: limited
+    limited_reason: 'Needs the owner''s Teller application and certificate (identity-bound signup). Owner step: sign up at https://teller.io, download the app certificate, run `moneybridge connect teller
+      --environment sandbox`, then `pytest -m sandbox`. Teller payments beta admission is also required.'
+- id: m6.alpaca-actions
+  milestone: M6
+  title: Alpaca limit orders, partial fills and approved cancellation
+  requirement: 'DECISIONS r3: brokerages like Alpaca (trade)'
+  module: executor
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_alpaca_actions.py::test_limit_order_lifecycle
+    level: sim
+    status: planned
+  - test: tests/e2e/test_alpaca_actions.py::test_partial_fills_within_bounds
+    level: sim
+    status: planned
+  - test: tests/e2e/test_alpaca_actions.py::test_cancel_open_order_needs_approval
+    level: sim
+    status: planned
+- id: m7.setup
+  milestone: M7
+  title: Plain terminal setup wizard, resumable, with a synthetic demo path
+  requirement: 'DECISIONS r1/r2: for everybody, runs on any computer, public MIT project'
+  module: host
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_setup.py::test_setup_wizard_demo_path
+    level: sim
+    status: planned
+  - test: tests/e2e/test_setup.py::test_setup_is_resumable
+    level: sim
+    status: planned
+- id: m7.services
+  milestone: M7
+  title: 'Background service install: systemd, launchd, Windows service'
+  requirement: 'DECISIONS r1/r2: for everybody, runs on any computer, public MIT project'
+  module: host
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_service.py::test_systemd_user_service_install_and_restart
+    level: sim
+    status: planned
+  - test: scripts/smoke_macos.sh::launchd_user_agent
+    level: sandbox
+    status: planned
+  - test: ci/windows::service_install
+    level: sandbox
+    status: limited
+    limited_reason: No Windows machine available; Windows coverage comes only from GitHub Actions windows-latest smoke tests.
+- id: m7.packages
+  milestone: M7
+  title: Native packages (PyInstaller bundle, .deb; signed macOS/Windows where possible)
+  requirement: 'DECISIONS r1/r2: for everybody, runs on any computer, public MIT project'
+  module: host
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_packaging.py::test_pyinstaller_bundle_runs_without_python
+    level: sim
+    status: planned
+  - test: tests/e2e/test_packaging.py::test_deb_package_installs
+    level: sim
+    status: planned
+  - test: release/macos-notarized-pkg
+    level: real
+    status: limited
+    limited_reason: 'Signing and notarization need the owner''s Apple Developer account (identity-bound, paid). Owner step: enroll at https://developer.apple.com/programs/ and add the signing identity to
+      the Air keychain.'
+  - test: release/windows-signed-installer
+    level: real
+    status: limited
+    limited_reason: 'Needs a code-signing certificate issued to the owner (identity-bound). Owner step: obtain an OV/EV code-signing certificate or Azure Trusted Signing account.'
+- id: m7.second-install
+  milestone: M7
+  title: Two independent installs share nothing (no hard-coded accounts)
+  requirement: 'DECISIONS r1/r2: for everybody, runs on any computer, public MIT project'
+  module: host
+  status: planned
+  scenarios:
+  - test: tests/e2e/test_second_install.py::test_two_installs_share_nothing
+    level: sim
+    status: planned
+- id: m7.docs-release
+  milestone: M7
+  title: Docs and a public GitHub release
+  requirement: 'DECISIONS r1/r2: for everybody, runs on any computer, public MIT project'
+  module: repo
+  status: planned
+  scenarios:
+  - test: tests/unit/test_repo_rules.py::test_docs_cover_every_operation
+    level: sim
+    status: planned
