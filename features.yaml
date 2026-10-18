@@ -296,7 +296,8 @@ features:
     status: planned
   - test: ci/windows::uv_install_demo
     level: sandbox
-    status: planned
+    status: limited
+    limited_reason: 'GitHub refuses workflow files from this machine: the gh token lacks the workflow scope and deploy keys cannot push workflows; the Air is locked so the device-flow grant cannot be completed. Owner step: run `gh auth refresh -s workflow` once (or unlock the Air), then move ci/github-actions-ci.yml to .github/workflows/.'
 - id: m2.schedule
   milestone: M2
   title: SimpleFIN scheduled 4x/day with jitter, shared budget, one catch-up after sleep
