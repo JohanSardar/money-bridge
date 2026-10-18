@@ -10,3 +10,4 @@ One line per unit. Rules: design/BUILD-GOAL.md. Statuses of record: features.yam
 - VERIFIED: sqlcipher3 0.6.4 bundles SQLCipher 4.x wheels for Linux/macOS/Windows; `systemd-creds --user` works without root here.
 - NEXT: M1 read bridge (worker).
 - DONE 2026-10-17 kernel: Money, canonical JSON/digest/stable ids, Clock (system + test offset file), profiles, error codes; unit tests.
+- IN PROGRESS 2026-10-17 M1 read bridge (worker, brief design/briefs/M1-read-bridge.md) and M5a executor core (worker in worktree, brief design/briefs/M5a-executor-core.md).
